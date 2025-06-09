@@ -60,10 +60,6 @@ def juego():
                 if evento.key in COLUMNA_TECLAS:
                     col = COLUMNA_TECLAS.index(evento.key)
                     presionadas[col] = False
-                    for nota in activas:
-                        if nota.column == col and nota.en_hold:
-                            nota.soltar()
-
 
         # Activar nuevas notas según tiempo
         while nota_idx < len(notas_activas) and notas_activas[nota_idx].inicio <= tiempo_rel:

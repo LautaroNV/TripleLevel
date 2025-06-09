@@ -1,6 +1,7 @@
 import pygame
 from recursos.colores import COLORES
 
+
 class TrasteGuitarra:
     def __init__(self, ancho, alto, columnas):
         self.ancho_total = ancho
