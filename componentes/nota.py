@@ -11,7 +11,10 @@ class Note:
         self.ancho_total = ancho_total
         self.columnas = columnas
 
-        self.x = int((self.ancho_total // self.columnas) * columna + (self.ancho_total // self.columnas) // 2)
+        col_width = self.ancho_total * 0.6 // self.columnas
+        self.offset_x = (self.ancho_total - self.ancho_total * 0.6) // 2
+        self.x = int(self.offset_x + col_width * columna + col_width // 2)
+
         self.y = -RADIO
         self.tocada = False
         self.en_hold = False
@@ -21,7 +24,8 @@ class Note:
         self.y += velocidad
 
     def en_zona(self, y_zona, altura_zona):
-        return y_zona - altura_zona // 2 <= self.y <= y_zona + altura_zona // 2
+        margen = 25  # margen para que sea más fácil tocar
+        return y_zona - altura_zona // 2 - margen <= self.y <= y_zona + altura_zona // 2 + margen
 
     def tocar(self):
         self.tocada = True
@@ -45,12 +49,18 @@ class Note:
 
         color = COLORES[self.column]
 
-        # HOLD
+        # HOLD (línea delgada + línea central blanca para estilo GH)
         if self.duracion > 0:
             alto_hold = self.duracion * 0.01
-            pygame.draw.rect(pantalla, color, (self.x - 6, int(self.y), 12, int(alto_hold)))
+            y_final = int(self.y + alto_hold)
 
-        # Cabeza
+            # Línea gruesa de color de la nota
+            pygame.draw.line(pantalla, color, (self.x, int(self.y)), (self.x, y_final), 10)
+
+            # Línea blanca central para efecto visual (opcional)
+            pygame.draw.line(pantalla, (255, 255, 255), (self.x, int(self.y)), (self.x, y_final), 2)
+
+        # Cabeza de la nota
         if not self.tocada or self.duracion == 0:
             pygame.draw.circle(pantalla, color, (self.x, int(self.y)), RADIO)
             pygame.draw.circle(pantalla, (255, 255, 255), (self.x, int(self.y)), RADIO // 2, 2)

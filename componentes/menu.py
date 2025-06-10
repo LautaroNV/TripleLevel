@@ -1,62 +1,88 @@
 import pygame
-
 import sys
-from recursos.colores import *
 
-def mostrar_menu(pantalla):
-    opciones = ["Elegir Nivel", "Instrucciones", "Salir"]
-    seleccion = 0
-    fuente = pygame.font.SysFont("Arial", 40)
+pygame.init()
 
-    while True:
-        pantalla.fill(NEGRO)
-        titulo = fuente.render("Note Rush - Menú", True, VERDE)
-        pantalla.blit(titulo, (250, 100))
+ANCHO = 900
+ALTO = 900
+NEGRO = (0, 0, 0)
 
+fondo = pygame.image.load("imgs/background.png")
+
+# Cargar fuente Hyperwave-One.ttf 
+fuente = pygame.font.Font("recursos/fuentes/Hyperwave-One.ttf", 70)
+
+opciones = ["ELEGIR NIVEL", "INSTRUCCIONES", "SALIR"]
+opciones_rects = []
+
+espaciado = 60
+inicio_y = 360
+
+def menu_principal(pantalla):
+    seleccion = -1
+    ejecutando = True
+
+    while ejecutando:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if evento.type == pygame.MOUSEBUTTONDOWN:
+                for i, rect in enumerate(opciones_rects):
+                    if rect.collidepoint(evento.pos):
+                        seleccion = i
+                        ejecutando = False
+
+        pantalla.blit(pygame.transform.scale(fondo, (ANCHO, ALTO)), (0, 0))
+
+        opciones_rects.clear()
         for i, texto in enumerate(opciones):
-            color = BLANCO if i == seleccion else GRIS
-            render = fuente.render(texto, True, color)
-            pantalla.blit(render, (260, 250 + i * 60))
+            render = fuente.render(texto, True, NEGRO)
+            rect = render.get_rect(center=(ANCHO // 2, inicio_y + i * espaciado))
+            pantalla.blit(render, rect)
+            opciones_rects.append(rect)
 
         pygame.display.flip()
 
-        for e in pygame.event.get():
-            if e.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if e.type == pygame.KEYDOWN:
-                if e.key == pygame.K_UP:
-                    seleccion = (seleccion - 1) % len(opciones)
-                elif e.key == pygame.K_DOWN:
-                    seleccion = (seleccion + 1) % len(opciones)
-                elif e.key == pygame.K_RETURN:
-                    if seleccion == 0:
-                        return "jugar"
-                    elif seleccion == 1:
-                        return "instrucciones"
-                    elif seleccion == 2:
-                        pygame.quit()
-                        sys.exit()
+    if seleccion == 0:
+        return "jugar"
+    elif seleccion == 1:
+        return "instrucciones"
+    else:
+        pygame.quit()
+        sys.exit()
 
 def mostrar_instrucciones(pantalla):
-    fuente = pygame.font.SysFont("Arial", 30)
+    ejecutando = True
+    fuente_inst = pygame.font.Font("recursos/fuentes/Hyperwave-One.ttf", 40)
     instrucciones = [
-        "Presiona A, S, D, F, G cuando la nota llegue al traste.",
-        "Cada color representa una tecla distinta.",
-        "¡Mantén el ritmo para obtener combos y puntaje!",
-        "Presiona ESC para volver al menú."
+        "Instrucciones del juego:",
+        "- Presiona las teclas A, S, D, F, G para tocar las notas.",
+        "- Mantén las notas largas pulsadas.",
+        "- No falles demasiadas notas o perderás.",
+        "Haz clic para volver al menú."
     ]
-    esperando = True
-    while esperando:
-        pantalla.fill(NEGRO)
-        for i, linea in enumerate(instrucciones):
-            render = fuente.render(linea, True, BLANCO)
-            pantalla.blit(render, (80, 150 + i * 50))
-        pygame.display.flip()
 
-        for e in pygame.event.get():
-            if e.type == pygame.QUIT:
+    while ejecutando:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
-                return "menu"
+            if evento.type == pygame.MOUSEBUTTONDOWN:
+                ejecutando = False
+
+        pantalla.blit(pygame.transform.scale(fondo, (ANCHO, ALTO)), (0, 0))
+        
+        for i, linea in enumerate(instrucciones):
+            texto_render = fuente_inst.render(linea, True, NEGRO)
+            rect = texto_render.get_rect(center=(ANCHO // 2, 200 + i * 40))
+            pantalla.blit(texto_render, rect)
+
+        pygame.display.flip()
+
+    return "menu"
+
+if __name__ == "__main__":
+    pantalla = pygame.display.set_mode((ANCHO, ALTO))
+    seleccion = menu_principal(pantalla)
+    print(f"Opción seleccionada: {seleccion}")
