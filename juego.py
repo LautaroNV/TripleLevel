@@ -15,7 +15,7 @@ FPS = 60
 RELOJ = pygame.time.Clock()
 
 ESTADO = "menu"
-COLUMNA_TECLAS = [pygame.K_a, pygame.K_s, pygame.K_d, pygame.K_f, pygame.K_g]
+COLUMNA_TECLAS = [pygame.K_a, pygame.K_s, pygame.K_j, pygame.K_k, pygame.K_l]
 CANT_COLUMNAS = 5
 TIEMPO_TOTAL = 78_000
 VELOCIDAD = 4.5
@@ -39,7 +39,7 @@ def juego():
     presionadas = [False] * CANT_COLUMNAS
     combo = 0
     puntuacion = 0
-    vidas = 5  # máximo
+    vidas = 10  # máximo
 
     ejecutando = True
     while ejecutando:
@@ -104,7 +104,7 @@ def juego():
             nota.dibujar(PANTALLA)
 
         # UI: Puntuación, combo, vidas
-        fuente = pygame.font.SysFont("Arial", 28)
+        fuente = pygame.font.Font("recursos/fuentes/Hyperwave-One.ttf", 28)
         puntos_txt = fuente.render(f"Puntos: {puntuacion}", True, BLANCO)
         combo_txt = fuente.render(f"Combo: {combo}", True, AZUL)
         PANTALLA.blit(puntos_txt, (20, 20))
@@ -112,7 +112,7 @@ def juego():
 
         # Barra de vida visual
         pygame.draw.rect(PANTALLA, ROJO, (20, 100, 200, 25))
-        pygame.draw.rect(PANTALLA, VERDE, (20, 100, max(0, int(200 * (vidas / 5))), 25))
+        pygame.draw.rect(PANTALLA, VERDE, (20, 100, max(0, int(200 * (vidas / 10))), 25))
         vida_txt = fuente.render(f"Vida", True, BLANCO)
         PANTALLA.blit(vida_txt, (230, 98))
 
