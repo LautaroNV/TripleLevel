@@ -5,8 +5,8 @@ RADIO = 25
 
 class Note:
     def __init__(self, tiempo_inicio, columna, duracion=0, ancho_total=800, columnas=5):
-        self.inicio = tiempo_inicio  # en ms
-        self.duracion = duracion  # en ms (solo >0 si es HOLD)
+        self.inicio = tiempo_inicio
+        self.duracion = duracion
         self.column = columna
         self.ancho_total = ancho_total
         self.columnas = columnas
@@ -24,7 +24,7 @@ class Note:
         self.y += velocidad
 
     def en_zona(self, y_zona, altura_zona):
-        margen = 25  # margen para que sea más fácil tocar
+        margen = 25
         return y_zona - altura_zona // 2 - margen <= self.y <= y_zona + altura_zona // 2 + margen
 
     def tocar(self):
@@ -49,18 +49,14 @@ class Note:
 
         color = COLORES[self.column]
 
-        # HOLD (línea delgada + línea central blanca para estilo GH)
         if self.duracion > 0:
             alto_hold = self.duracion * 0.01
             y_final = int(self.y + alto_hold)
 
-            # Línea gruesa de color de la nota
             pygame.draw.line(pantalla, color, (self.x, int(self.y)), (self.x, y_final), 10)
-
-            # Línea blanca central para efecto visual (opcional)
             pygame.draw.line(pantalla, (255, 255, 255), (self.x, int(self.y)), (self.x, y_final), 2)
 
-        # Cabeza de la nota
+        # Dibuja el anillo colorido con centro blanco (como en la imagen)
         if not self.tocada or self.duracion == 0:
             pygame.draw.circle(pantalla, color, (self.x, int(self.y)), RADIO)
-            pygame.draw.circle(pantalla, (255, 255, 255), (self.x, int(self.y)), RADIO // 2, 2)
+            pygame.draw.circle(pantalla, (255, 255, 255), (self.x, int(self.y)), RADIO // 2)

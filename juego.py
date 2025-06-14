@@ -58,7 +58,10 @@ def juego():
                     acierto = False
                     for nota in activas:
                         if nota.column == col and nota.en_zona(traste.y_zona, traste.altura_zona) and not nota.tocada:
-                            nota.tocar()
+                            if isinstance(nota, HoldNote):
+                                nota.tocar(traste.y_zona)
+                            else:
+                                nota.tocar()
                             puntuacion += 100
                             combo += 1
                             acierto = True
@@ -71,8 +74,8 @@ def juego():
                     col = COLUMNA_TECLAS.index(evento.key)
                     presionadas[col] = False
                     for nota in activas:
-                        if hasattr(nota, 'en_hold') and nota.column == col and nota.en_hold:
-                            nota.soltar()
+                        if isinstance(nota, HoldNote) and nota.column == col and nota.en_hold:
+                            nota.soltar(ahora)  # ← Aquí está el fix
                             combo = 0
                             vidas -= 1
                             break
@@ -84,7 +87,10 @@ def juego():
 
         # Actualizar y eliminar notas fuera de pantalla
         for nota in activas:
-            nota.actualizar(VELOCIDAD)
+            if isinstance(nota, HoldNote):
+                nota.actualizar(VELOCIDAD, ahora)
+            else:
+                nota.actualizar(VELOCIDAD)
 
         nuevas_activas = []
         for nota in activas:
