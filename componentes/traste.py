@@ -17,7 +17,7 @@ class TrasteGuitarra:
         self.scroll_y = 0
 
     def dibujar(self, pantalla, presionadas):
-        self.scroll_y += 4  # velocidad del scroll (hacia abajo)
+        self.scroll_y += 6  # velocidad del scroll (hacia abajo)
         if self.scroll_y >= self.imagen.get_height():
             self.scroll_y = 0
 

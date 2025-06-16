@@ -17,13 +17,17 @@ RELOJ = pygame.time.Clock()
 ESTADO = "menu"
 COLUMNA_TECLAS = [pygame.K_a, pygame.K_s, pygame.K_j, pygame.K_k, pygame.K_l]
 CANT_COLUMNAS = 5
-TIEMPO_TOTAL = 78_000
-VELOCIDAD = 4.5
+TIEMPO_TOTAL = 234_000
+VELOCIDAD = 15
 
 def juego():
     global ESTADO
     tiempo_inicio = pygame.time.get_ticks()
     traste = TrasteGuitarra(ANCHO, ALTO, CANT_COLUMNAS)
+
+    # Reproducir música
+    pygame.mixer.music.load("canciones/nivel1.wav")
+    pygame.mixer.music.play()
 
     # Cargar notas mixtas (tap y hold)
     notas_activas = []
@@ -39,7 +43,7 @@ def juego():
     presionadas = [False] * CANT_COLUMNAS
     combo = 0
     puntuacion = 0
-    vidas = 10  # máximo
+    vidas = 50  # máximo
 
     ejecutando = True
     while ejecutando:
@@ -75,9 +79,12 @@ def juego():
                     presionadas[col] = False
                     for nota in activas:
                         if isinstance(nota, HoldNote) and nota.column == col and nota.en_hold:
-                            nota.soltar(ahora)  # ← Aquí está el fix
-                            combo = 0
-                            vidas -= 1
+                            nota.soltar(ahora)
+                            if nota.completada:
+                                pass  # No pierde vida si se completó correctamente
+                            else:
+                                combo = 0
+                                vidas -= 1
                             break
 
         # Activar nuevas notas
@@ -118,13 +125,14 @@ def juego():
 
         # Barra de vida visual
         pygame.draw.rect(PANTALLA, ROJO, (20, 100, 200, 25))
-        pygame.draw.rect(PANTALLA, VERDE, (20, 100, max(0, int(200 * (vidas / 10))), 25))
+        pygame.draw.rect(PANTALLA, VERDE, (20, 100, max(0, int(200 * (vidas / 50))), 25))
         vida_txt = fuente.render(f"Vida", True, BLANCO)
         PANTALLA.blit(vida_txt, (230, 98))
 
         pygame.display.flip()
 
         if tiempo_rel >= TIEMPO_TOTAL or vidas <= 0:
+            pygame.mixer.music.stop()
             ESTADO = "menu"
             ejecutando = False
 

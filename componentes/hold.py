@@ -25,40 +25,68 @@ class HoldNote:
         self.y = -RADIO
         self.y_fijada = None
 
-        self.color = COLORES[self.column]
+        self.color = COLORES[self.column % len(COLORES)]
+        self.tiempo_tocado = None
+        self.tiempo_actual = 0
+
+        # FACTOR PARA CONTROLAR LA ALTURA DE LA BARRA DE CONSUMO
+        # A mayor valor, más larga visualmente la línea (valor típico: 0.08 - 0.15)
+        self.factor_pixeles = 1
 
     def actualizar(self, velocidad, tiempo_actual):
+        self.tiempo_actual = tiempo_actual
+
         if self.completada:
             return
 
         if not self.y_fijada:
             self.y += velocidad
 
-        tiempo_final = self.inicio + self.duracion
-        if self.en_hold and tiempo_actual >= tiempo_final:
-            self.completada = True
+        if self.en_hold:
+            tiempo_pasado = tiempo_actual - self.tiempo_tocado
+            if tiempo_pasado >= self.duracion:
+                self.completada = True
 
     def dibujar(self, pantalla):
         if self.completada:
             return
 
-        self.dibujar_hold_linea(pantalla)
-        self.dibujar_cabeza(pantalla)
+        if self.tocada:
+            self.dibujar_hold_linea(pantalla)
+        else:
+            self.dibujar_hold_linea(pantalla)
+            self.dibujar_cabeza(pantalla)
 
     def dibujar_hold_linea(self, pantalla):
-        alto_hold = self.duracion * 0.01
+        if self.soltada:
+            return  # No mostrar la línea si se soltó antes
+
+        if self.tocada:
+            tiempo_pasado = self.tiempo_actual - self.tiempo_tocado
+            porcentaje = max(0, 1 - tiempo_pasado / self.duracion)
+            alto_hold = max(5, self.duracion * self.factor_pixeles * porcentaje)
+        else:
+            alto_hold = self.duracion * self.factor_pixeles
+
         y_base = self.y_fijada if self.y_fijada is not None else self.y
         y_final = int(y_base - alto_hold)
 
-        color_dibujo = COLOR_GRIS if self.soltada else (self.color if not self.en_hold else self.brillo(self.color))
+        if self.en_hold:
+            color_dibujo = self.brillo(self.color)
+        else:
+            color_dibujo = self.color
 
         pygame.draw.line(pantalla, color_dibujo, (self.x, int(y_base)), (self.x, y_final), ANCHO_LINEA)
         pygame.draw.line(pantalla, (255, 255, 255), (self.x, int(y_base)), (self.x, y_final), 2)
 
-        pygame.draw.circle(pantalla, color_dibujo, (self.x, y_final), RADIO // 2)
-        pygame.draw.circle(pantalla, (255, 255, 255), (self.x, y_final), RADIO // 4)
+        if not self.tocada:
+            pygame.draw.circle(pantalla, color_dibujo, (self.x, y_final), RADIO // 2)
+            pygame.draw.circle(pantalla, (255, 255, 255), (self.x, y_final), RADIO // 4)
 
     def dibujar_cabeza(self, pantalla):
+        if self.tocada:
+            return
+
         y_draw = self.y_fijada if self.y_fijada is not None else self.y
         color_dibujo = COLOR_GRIS if self.soltada else self.color
 
@@ -73,14 +101,21 @@ class HoldNote:
         self.tocada = True
         self.en_hold = True
         self.y_fijada = y_zona
+        self.tiempo_tocado = pygame.time.get_ticks()
 
     def soltar(self, tiempo_actual):
-        self.en_hold = False
-        self.soltada = True
+        if self.tocada:
+            tiempo_pasado = tiempo_actual - self.tiempo_tocado
+            if tiempo_pasado >= self.duracion:
+                self.completada = True
+            else:
+                self.en_hold = False
+                self.soltada = True
+                # Ya fue tocada correctamente, pero no completada. No penalizar combo ni vida.
 
     def fuera_de_pantalla(self, alto):
         y_base = self.y_fijada if self.y_fijada is not None else self.y
-        final_y = y_base - self.duracion * 0.01
+        final_y = y_base - self.duracion * self.factor_pixeles
         return final_y > alto
 
     def brillo(self, color):
