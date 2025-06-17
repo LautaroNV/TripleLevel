@@ -1,124 +1,168 @@
 import pygame
-import sys
+import pygame.mixer
 
-pygame.init()
+# Estado global de la música
+musica_activada = True
 
-ANCHO = 900
-ALTO = 900
-NEGRO = (0, 0, 0)
 
-# Fondos
-fondo = pygame.image.load("imgs/background.png")
-fondo_instrucciones = pygame.image.load("imgs/background2.png")
-fondo_instrucciones = pygame.transform.scale(fondo_instrucciones, (ANCHO, ALTO))
 
-# Fuentes
-fuente = pygame.font.Font("recursos/fuentes/Hyperwave-One.ttf", 70)
-fuente_inst = pygame.font.Font("recursos/fuentes/Hyperwave-One.ttf", 36)
+def cargar_fuente(tamano):
+    return pygame.font.Font("recursos/fuentes/Hyperwave-One.ttf", tamano)
 
-# Opciones del menú
-opciones = ["ELEGIR NIVEL", "INSTRUCCIONES", "SALIR"]
-opciones_rects = []
+def reproducir_musica_menu():
+    pygame.mixer.music.load("canciones/cancionmenu.wav")
+    pygame.mixer.music.set_volume(0.3)  # volumen moderado
+    pygame.mixer.music.play(-1)
 
-espaciado = 120
-inicio_y = 360
+def detener_musica_menu():
+    pygame.mixer.music.stop()
 
-# Teclas animadas (A1.png/A2.png, etc.)
-teclas = {
-    "A": [pygame.image.load("imgs/A1.png"), pygame.image.load("imgs/A2.png")],
-    "S": [pygame.image.load("imgs/S1.png"), pygame.image.load("imgs/S2.png")],
-    "J": [pygame.image.load("imgs/J1.png"), pygame.image.load("imgs/J2.png")],
-    "K": [pygame.image.load("imgs/K1.png"), pygame.image.load("imgs/K2.png")],
-    "L": [pygame.image.load("imgs/L1.png"), pygame.image.load("imgs/L2.png")]
-}
-
-# Escalar teclas
-for k in teclas:
-    teclas[k][0] = pygame.transform.scale(teclas[k][0], (64, 64))
-    teclas[k][1] = pygame.transform.scale(teclas[k][1], (64, 64))
+def dibujar_boton_musica(pantalla, musica_activada, boton_rect):
+    icono = pygame.image.load("imgs/on.png" if musica_activada else "imgs/off.png").convert_alpha()
+    icono = pygame.transform.scale(icono, (40, 40))  # más pequeño
+    pantalla.blit(icono, boton_rect.topleft)
+    return boton_rect
 
 def menu_principal(pantalla):
-    seleccion = -1
-    ejecutando = True
+    global musica_activada
+    fondo = pygame.image.load("imgs/background.png").convert()
+    fondo = pygame.transform.scale(fondo, pantalla.get_size())
 
-    while ejecutando:
+    fuente = cargar_fuente(40)
+    opciones = ["Elegir Nivel", "Instrucciones", "Salir"]
+    rects_opciones = []
+
+    boton_musica_rect = pygame.Rect(pantalla.get_width() - 50, 10, 40, 40)
+
+    if musica_activada and not pygame.mixer.music.get_busy():
+        reproducir_musica_menu()
+
+    while True:
+        pantalla.blit(fondo, (0, 0))
+
+        rects_opciones.clear()
+        for i, texto in enumerate(opciones):
+            render = fuente.render(texto, True, (0, 0, 0))
+            rect = render.get_rect(center=(pantalla.get_width() // 2, 350 + i * 70))
+            pantalla.blit(render, rect)
+            rects_opciones.append((rect, texto))
+
+        dibujar_boton_musica(pantalla, musica_activada, boton_musica_rect)
+
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                return "salir"
             if evento.type == pygame.MOUSEBUTTONDOWN:
-                for i, rect in enumerate(opciones_rects):
+                if boton_musica_rect.collidepoint(evento.pos):
+                    musica_activada = not musica_activada
+                    if musica_activada:
+                        reproducir_musica_menu()
+                    else:
+                        detener_musica_menu()
+                for rect, texto in rects_opciones:
                     if rect.collidepoint(evento.pos):
-                        seleccion = i
-                        ejecutando = False
-
-        pantalla.blit(pygame.transform.scale(fondo, (ANCHO, ALTO)), (0, 0))
-
-        opciones_rects.clear()
-        for i, texto in enumerate(opciones):
-            render = fuente.render(texto, True, NEGRO)
-            rect = render.get_rect(center=(ANCHO // 2, inicio_y + i * espaciado))
-            pantalla.blit(render, rect)
-            opciones_rects.append(rect)
+                        if texto == "Elegir Nivel":
+                            return "elegir_nivel"
+                        elif texto == "Instrucciones":
+                            return "instrucciones"
+                        elif texto == "Salir":
+                            pygame.quit()
+                            exit()
 
         pygame.display.flip()
-
-    if seleccion == 0:
-        return "jugar"
-    elif seleccion == 1:
-        return "instrucciones"
-    else:
-        pygame.quit()
-        sys.exit()
 
 def mostrar_instrucciones(pantalla):
-    reloj = pygame.time.Clock()
-    ejecutando = True
+    fondo = pygame.image.load("imgs/background2.png").convert()
+    fondo = pygame.transform.scale(fondo, pantalla.get_size())
 
-    instrucciones = [
-        "Presiona las teclas para tocar las notas.",
-        "Mantén las notas largas pulsadas.",
-        "No falles demasiadas notas o perderás."
-    ]
+    fuente = cargar_fuente(28)
+    texto1 = fuente.render("Presiona cuando las notas lleguen a la línea", True, (0, 0, 0))
+    texto2 = fuente.render("Las notas largas deben mantenerse presionadas", True, (0, 0, 0))
 
-    # Animación de teclas
+    teclas = ['A', 'S', 'J', 'K', 'L']
+    sprites = {}
+    for tecla in teclas:
+        frame1 = pygame.image.load(f"imgs/{tecla}1.png").convert_alpha()
+        frame2 = pygame.image.load(f"imgs/{tecla}2.png").convert_alpha()
+        frame1 = pygame.transform.scale(frame1, (70, 70))
+        frame2 = pygame.transform.scale(frame2, (70, 70))
+        sprites[tecla] = [frame1, frame2]
+
     frame_actual = 0
-    frame_rate = 20
-    teclas_orden = ["A", "S", "J", "K", "L"]
-    x_base = ANCHO // 2 - (5 * 64 + 4 * 10) // 2
-    y_teclas = 450  # MÁS ARRIBA: DENTRO del papel blanco
+    frame_timer = 0
+    frame_interval = 400
+    clock = pygame.time.Clock()
 
-    while ejecutando:
+    while True:
+        tiempo_pasado = clock.tick(60)
+        frame_timer += tiempo_pasado
+
+        if frame_timer >= frame_interval:
+            frame_actual = (frame_actual + 1) % 2
+            frame_timer = 0
+
+        pantalla.blit(fondo, (0, 0))
+        pantalla.blit(texto1, (pantalla.get_width() // 2 - texto1.get_width() // 2, 300))
+        pantalla.blit(texto2, (pantalla.get_width() // 2 - texto2.get_width() // 2, 340))
+
+        spacing = 85
+        start_x = pantalla.get_width() // 2 - (len(teclas) * spacing) // 2
+        y_pos = 450
+        for i, tecla in enumerate(teclas):
+            sprite = sprites[tecla][frame_actual]
+            pantalla.blit(sprite, (start_x + i * spacing, y_pos))
+
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif evento.type == pygame.MOUSEBUTTONDOWN:
-                ejecutando = False
-
-        pantalla.blit(fondo_instrucciones, (0, 0))
-
-        # Dibujar instrucciones DENTRO del papel blanco
-        y_inicio = 280
-        for i, linea in enumerate(instrucciones):
-            render = fuente_inst.render(linea, True, NEGRO)
-            rect = render.get_rect(center=(ANCHO // 2, y_inicio + i * 40))
-            pantalla.blit(render, rect)
-
-        # Animación teclas (bucle)
-        frame_actual = (frame_actual + 1) % (frame_rate * 2)
-        imagen_index = 0 if frame_actual < frame_rate else 1
-
-        for i, tecla in enumerate(teclas_orden):
-            imagen = teclas[tecla][imagen_index]
-            pantalla.blit(imagen, (x_base + i * (64 + 10), y_teclas))
+                return "salir"
+            if evento.type == pygame.MOUSEBUTTONDOWN:
+                return "menu"
 
         pygame.display.flip()
-        reloj.tick(60)
 
-    return "menu"
+def mostrar_seleccion_nivel(pantalla):
+    global musica_activada
+    fondo = pygame.image.load("imgs/background4.png").convert()
+    fondo = pygame.transform.scale(fondo, pantalla.get_size())
 
-if __name__ == "__main__":
-    pantalla = pygame.display.set_mode((ANCHO, ALTO))
-    seleccion = menu_principal(pantalla)
-    print(f"Opción seleccionada: {seleccion}")
+    fuente = cargar_fuente(40)
+    opciones = ["Nivel 1", "Nivel 2", "Nivel 3", "Volver al menú"]
+    rects_opciones = []
+
+    boton_musica_rect = pygame.Rect(pantalla.get_width() - 50, 10, 40, 40)
+
+    while True:
+        pantalla.blit(fondo, (0, 0))
+
+        rects_opciones.clear()
+        for i, texto in enumerate(opciones):
+            render = fuente.render(texto, True, (0, 0, 0))
+            rect = render.get_rect(center=(pantalla.get_width() // 2, 350 + i * 70))
+            pantalla.blit(render, rect)
+            rects_opciones.append((rect, texto))
+
+        dibujar_boton_musica(pantalla, musica_activada, boton_musica_rect)
+
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                return "salir"
+            if evento.type == pygame.MOUSEBUTTONDOWN:
+                if boton_musica_rect.collidepoint(evento.pos):
+                    musica_activada = not musica_activada
+                    if musica_activada:
+                        reproducir_musica_menu()
+                    else:
+                        detener_musica_menu()
+                for rect, texto in rects_opciones:
+                    if rect.collidepoint(evento.pos):
+                        detener_musica_menu()
+                        if texto == "Nivel 1":
+                            return "jugar_1"
+                        elif texto == "Nivel 2":
+                            return "jugar_2"
+                        elif texto == "Nivel 3":
+                            return "jugar_3"
+                        elif texto == "Volver al menú":
+                            return "menu"
+
+        pygame.display.flip()
