@@ -7,7 +7,7 @@ def mostrar_menu():
     pantalla = pygame.display.set_mode((ancho, largo))
     pygame.display.set_caption("Deadshoot - Menú")
 
-    fondo = pygame.image.load("imgs/img9.jpg").convert()
+    fondo = pygame.image.load("imgs/fondo.png").convert()
     fondo = pygame.transform.scale(fondo, (ancho, largo))
 
     color_normal = (180, 180, 180)
