@@ -7,6 +7,7 @@ def mostrar_menu():
     pantalla = pygame.display.set_mode((ancho, largo))
     pygame.display.set_caption("Deadshoot - Menú")
 
+<<<<<<< HEAD
     fondo = pygame.image.load("imgs/fondo.png").convert()
     fondo = pygame.transform.scale(fondo, (ancho, largo))
 
@@ -37,22 +38,55 @@ def mostrar_menu():
         return False
 
     
+=======
+    fondo_menu = pygame.image.load("imgs/logo.png").convert()
+    fondo_menu = pygame.transform.scale(fondo_menu, (ancho, largo))
+
+    fondo_instrucciones = pygame.image.load("imgs/logo4.png").convert()
+    fondo_instrucciones = pygame.transform.scale(fondo_instrucciones, (ancho, largo))
+
+    fondo_nombre = pygame.image.load("imgs/logo5.png").convert()
+    fondo_nombre = pygame.transform.scale(fondo_nombre, (ancho, largo))
+
+    reloj = pygame.time.Clock()
+
+    zonas_boton = {
+        "JUGAR": pygame.Rect(500, 350, 300, 50),
+        "INSTRUCCIONES": pygame.Rect(460, 420, 400, 50),
+        "SALIR": pygame.Rect(540, 490, 200, 50)
+    }
+
+    fuente_boton = pygame.font.SysFont(None, 36)
+
+>>>>>>> main
     def pedir_nombre():
         nombre = ""
         fuente_nombre = pygame.font.SysFont(None, 40)
         input_active = True
+<<<<<<< HEAD
         input_rect = pygame.Rect(250, 300, 300, 50)
         color_input_box = pygame.Color('lightskyblue3')
         color_input_text = pygame.Color('black')
 
         while input_active:
             pantalla.fill((255, 255, 255))
+=======
+        input_rect = pygame.Rect(400, 300, 400, 50)
+        color_input_box = pygame.Color('red')
+        color_input_text = pygame.Color('white')
+
+        while input_active:
+            pantalla.blit(fondo_nombre, (0, 0))
+>>>>>>> main
 
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
                 if evento.type == pygame.KEYDOWN:
                     if evento.key == pygame.K_RETURN and nombre != "":
                         input_active = False
@@ -61,7 +95,11 @@ def mostrar_menu():
                     else:
                         nombre += evento.unicode
 
+<<<<<<< HEAD
             texto_nombre = fuente_nombre.render(f"Introduce tu nombre: {nombre}", True, color_input_text)
+=======
+            texto_nombre = fuente_nombre.render(f"Ingresá tu nombre: {nombre}", True, color_input_text)
+>>>>>>> main
             pantalla.blit(texto_nombre, (input_rect.x + 10, input_rect.y + 10))
             pygame.draw.rect(pantalla, color_input_box, input_rect, 2)
 
@@ -71,10 +109,14 @@ def mostrar_menu():
         return nombre
 
     def mostrar_instrucciones():
+<<<<<<< HEAD
         fondo_instr = pygame.image.load("imgs/img9.jpg").convert()
         fondo_instr = pygame.transform.scale(fondo_instr, (ancho, largo))
         pantalla.blit(fondo_instr, (0, 0))
 
+=======
+        pantalla.blit(fondo_instrucciones, (0, 0))
+>>>>>>> main
         instrucciones_texto = (
             "El juego consiste en derribar los platos que van pasando.\n"
             "Derriba 5 platos para pasar al siguiente nivel.\n"
@@ -101,6 +143,7 @@ def mostrar_menu():
                 if evento.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+<<<<<<< HEAD
                 if evento.type == pygame.KEYDOWN:
                     if evento.key == pygame.K_RETURN:
                         esperando = False
@@ -119,11 +162,42 @@ def mostrar_menu():
         if boton(pantalla, "Salir", 300, 430, 200, 60):
             pygame.quit()
             sys.exit()
+=======
+                if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
+                    esperando = False
+
+    while True:
+        pantalla.blit(fondo_menu, (0, 0))
+
+        for nombre_boton, rect in zonas_boton.items():
+            pygame.draw.rect(pantalla, (0, 0, 0), rect, 0)
+            texto = fuente_boton.render(nombre_boton, True, (255, 0, 0))
+            texto_rect = texto.get_rect(center=rect.center)
+            pantalla.blit(texto, texto_rect)
+>>>>>>> main
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
+<<<<<<< HEAD
+=======
+            if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
+                pos = pygame.mouse.get_pos()
+
+                if zonas_boton["JUGAR"].collidepoint(pos):
+                    nombre_jugador = pedir_nombre()
+                    print(f"Jugador: {nombre_jugador}")
+                    return nombre_jugador
+
+                elif zonas_boton["INSTRUCCIONES"].collidepoint(pos):
+                    mostrar_instrucciones()
+
+                elif zonas_boton["SALIR"].collidepoint(pos):
+                    pygame.quit()
+                    sys.exit()
+
+>>>>>>> main
         pygame.display.update()
         reloj.tick(60)
