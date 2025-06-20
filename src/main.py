@@ -77,7 +77,7 @@ def iniciar_juego():
             sonido_disparo, ancho, nivel["fondo"], nivel["mensaje"],
             arma_esperando, arma_disparo, arma_retroceso, puntacion
         )
-        if puntacion == -1:  
+        if puntacion == -1:
             break
         nivel = volver_al_menu()
 
