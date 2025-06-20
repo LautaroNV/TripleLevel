@@ -19,18 +19,24 @@ RELOJ = pygame.time.Clock()
 ESTADO = "menu"
 COLUMNA_TECLAS = [pygame.K_a, pygame.K_s, pygame.K_j, pygame.K_k, pygame.K_l]
 CANT_COLUMNAS = 5
-TIEMPO_TOTAL = 150_000
 VELOCIDAD = 15
 
-# Cargar imagen de fondo
+# Fondo
 fondo = pygame.image.load("imgs/background3.png").convert()
 fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
 
-# Asociación de estados con sus canciones .wav
+# Archivos de música por nivel
 archivos_canciones = {
     "jugar_1": "canciones/cancion1.wav",
     "jugar_2": "canciones/cancion2.wav",
     "jugar_3": "canciones/cancion3.wav",
+}
+
+# Tiempos de duración por nivel
+tiempos_canciones = {
+    "jugar_1": 150000,     # Mississippi Queen 
+    "jugar_2": 190000,     # School`s Out 
+    "jugar_3": 170000,    # Hit me with your best shot
 }
 
 def juego(notas, estado_actual):
@@ -38,7 +44,9 @@ def juego(notas, estado_actual):
     tiempo_inicio = pygame.time.get_ticks()
     traste = TrasteGuitarra(ANCHO, ALTO, CANT_COLUMNAS)
 
-    # Reproducir música correspondiente al nivel
+    tiempo_total = tiempos_canciones.get(estado_actual, 90000)
+
+    # Música del nivel
     archivo_musica = archivos_canciones.get(estado_actual)
     if archivo_musica:
         pygame.mixer.music.load(archivo_musica)
@@ -94,9 +102,7 @@ def juego(notas, estado_actual):
                     for nota in activas:
                         if isinstance(nota, HoldNote) and nota.column == col and nota.en_hold:
                             nota.soltar(ahora)
-                            if nota.completada:
-                                pass
-                            else:
+                            if not nota.completada:
                                 combo = 0
                                 vidas -= 1
                             break
@@ -134,12 +140,12 @@ def juego(notas, estado_actual):
 
         pygame.draw.rect(PANTALLA, ROJO, (20, 100, 200, 25))
         pygame.draw.rect(PANTALLA, VERDE, (20, 100, max(0, int(200 * (vidas / 50))), 25))
-        vida_txt = fuente.render(f"Vida", True, BLANCO)
+        vida_txt = fuente.render("Vida", True, BLANCO)
         PANTALLA.blit(vida_txt, (230, 98))
 
         pygame.display.flip()
 
-        if tiempo_rel >= TIEMPO_TOTAL or vidas <= 0:
+        if tiempo_rel >= tiempo_total or vidas <= 0:
             pygame.mixer.music.stop()
             ESTADO = "menu"
             ejecutando = False
