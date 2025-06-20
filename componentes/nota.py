@@ -56,7 +56,11 @@ class Note:
             pygame.draw.line(pantalla, color, (self.x, int(self.y)), (self.x, y_final), 10)
             pygame.draw.line(pantalla, (255, 255, 255), (self.x, int(self.y)), (self.x, y_final), 2)
 
-        # Dibuja el anillo colorido con centro blanco (como en la imagen)
         if not self.tocada or self.duracion == 0:
+            # Borde negro exterior
+            pygame.draw.circle(pantalla, (0, 0, 0), (self.x, int(self.y)), RADIO + 2)
             pygame.draw.circle(pantalla, color, (self.x, int(self.y)), RADIO)
+
+            # Centro blanco con borde negro
+            pygame.draw.circle(pantalla, (0, 0, 0), (self.x, int(self.y)), RADIO // 2 + 2)
             pygame.draw.circle(pantalla, (255, 255, 255), (self.x, int(self.y)), RADIO // 2)

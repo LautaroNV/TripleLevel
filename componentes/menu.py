@@ -1,17 +1,15 @@
 import pygame
 import pygame.mixer
+import sqlite3
 
-# Estado global de la música
 musica_activada = True
-
-
 
 def cargar_fuente(tamano):
     return pygame.font.Font("recursos/fuentes/Hyperwave-One.ttf", tamano)
 
 def reproducir_musica_menu():
     pygame.mixer.music.load("canciones/cancionmenu.wav")
-    pygame.mixer.music.set_volume(0.3)  # volumen moderado
+    pygame.mixer.music.set_volume(0.3)
     pygame.mixer.music.play(-1)
 
 def detener_musica_menu():
@@ -19,7 +17,7 @@ def detener_musica_menu():
 
 def dibujar_boton_musica(pantalla, musica_activada, boton_rect):
     icono = pygame.image.load("imgs/on.png" if musica_activada else "imgs/off.png").convert_alpha()
-    icono = pygame.transform.scale(icono, (40, 40))  # más pequeño
+    icono = pygame.transform.scale(icono, (40, 40))
     pantalla.blit(icono, boton_rect.topleft)
     return boton_rect
 
@@ -29,7 +27,7 @@ def menu_principal(pantalla):
     fondo = pygame.transform.scale(fondo, pantalla.get_size())
 
     fuente = cargar_fuente(40)
-    opciones = ["Elegir Nivel", "Instrucciones", "Salir"]
+    opciones = ["Elegir Nivel", "Instrucciones", "Puntuaciones", "Salir"]
     rects_opciones = []
 
     boton_musica_rect = pygame.Rect(pantalla.get_width() - 50, 10, 40, 40)
@@ -39,8 +37,8 @@ def menu_principal(pantalla):
 
     while True:
         pantalla.blit(fondo, (0, 0))
-
         rects_opciones.clear()
+
         for i, texto in enumerate(opciones):
             render = fuente.render(texto, True, (0, 0, 0))
             rect = render.get_rect(center=(pantalla.get_width() // 2, 350 + i * 70))
@@ -65,6 +63,8 @@ def menu_principal(pantalla):
                             return "elegir_nivel"
                         elif texto == "Instrucciones":
                             return "instrucciones"
+                        elif texto == "Puntuaciones":
+                            return "puntuaciones"
                         elif texto == "Salir":
                             pygame.quit()
                             exit()
@@ -164,5 +164,43 @@ def mostrar_seleccion_nivel(pantalla):
                             return "jugar_3"
                         elif texto == "Volver al menú":
                             return "menu"
+        pygame.display.flip()
+
+def mostrar_puntuaciones(pantalla):
+    fondo = pygame.image.load("imgs/background5.png").convert()
+    fondo = pygame.transform.scale(fondo, pantalla.get_size())
+
+    efecto = pygame.mixer.Sound("canciones/efecto.wav")
+    efecto.set_volume(0.25)  # Volumen reducido
+    efecto.play()
+
+    fuente_titulo = cargar_fuente(52)
+    fuente_texto = cargar_fuente(26)
+    titulo = fuente_titulo.render("PUNTUACIONES", True, (255, 255, 0))
+
+    conn = sqlite3.connect("puntuaciones.db")
+    cursor = conn.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS puntuaciones (id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT, puntos INTEGER, combo INTEGER, aciertos INTEGER, nivel TEXT)")
+    cursor.execute("SELECT nombre, puntos, combo, aciertos, nivel FROM puntuaciones ORDER BY puntos DESC LIMIT 10")
+    resultados = cursor.fetchall()
+    conn.close()
+
+    clock = pygame.time.Clock()
+    while True:
+        pantalla.blit(fondo, (0, 0))
+        pantalla.blit(titulo, (pantalla.get_width() // 2 - titulo.get_width() // 2, 40))
+
+        y = 140
+        for i, fila in enumerate(resultados):
+            nombre, puntos, combo, aciertos, nivel = fila
+            texto = f"{i+1}. {nombre} - {puntos} PTS - COMBO: {combo} - ACIERTOS: {aciertos} - {nivel.upper()}"
+            render = fuente_texto.render(texto, True, (255, 255, 255))
+            pantalla.blit(render, (50, y))
+            y += 40
+
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT or evento.type == pygame.MOUSEBUTTONDOWN:
+                return "menu"
 
         pygame.display.flip()
+        clock.tick(60)

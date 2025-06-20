@@ -29,8 +29,6 @@ class HoldNote:
         self.tiempo_tocado = None
         self.tiempo_actual = 0
 
-        # FACTOR PARA CONTROLAR LA ALTURA DE LA BARRA DE CONSUMO
-        # A mayor valor, más larga visualmente la línea (valor típico: 0.08 - 0.15)
         self.factor_pixeles = 1
 
     def actualizar(self, velocidad, tiempo_actual):
@@ -59,7 +57,7 @@ class HoldNote:
 
     def dibujar_hold_linea(self, pantalla):
         if self.soltada:
-            return  # No mostrar la línea si se soltó antes
+            return
 
         if self.tocada:
             tiempo_pasado = self.tiempo_actual - self.tiempo_tocado
@@ -80,7 +78,9 @@ class HoldNote:
         pygame.draw.line(pantalla, (255, 255, 255), (self.x, int(y_base)), (self.x, y_final), 2)
 
         if not self.tocada:
+            pygame.draw.circle(pantalla, (0, 0, 0), (self.x, y_final), RADIO // 2 + 2)
             pygame.draw.circle(pantalla, color_dibujo, (self.x, y_final), RADIO // 2)
+            pygame.draw.circle(pantalla, (0, 0, 0), (self.x, y_final), RADIO // 4 + 2)
             pygame.draw.circle(pantalla, (255, 255, 255), (self.x, y_final), RADIO // 4)
 
     def dibujar_cabeza(self, pantalla):
@@ -90,7 +90,9 @@ class HoldNote:
         y_draw = self.y_fijada if self.y_fijada is not None else self.y
         color_dibujo = COLOR_GRIS if self.soltada else self.color
 
+        pygame.draw.circle(pantalla, (0, 0, 0), (self.x, int(y_draw)), RADIO + 2)
         pygame.draw.circle(pantalla, color_dibujo, (self.x, int(y_draw)), RADIO)
+        pygame.draw.circle(pantalla, (0, 0, 0), (self.x, int(y_draw)), RADIO // 2 + 2)
         pygame.draw.circle(pantalla, (255, 255, 255), (self.x, int(y_draw)), RADIO // 2)
 
     def en_zona(self, y_zona, altura_zona):
@@ -111,7 +113,6 @@ class HoldNote:
             else:
                 self.en_hold = False
                 self.soltada = True
-                # Ya fue tocada correctamente, pero no completada. No penalizar combo ni vida.
 
     def fuera_de_pantalla(self, alto):
         y_base = self.y_fijada if self.y_fijada is not None else self.y
