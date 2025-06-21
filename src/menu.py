@@ -1,122 +1,159 @@
 import pygame
 import sys
-from configuracion import ancho, largo
+from configuracion import Configuracion
+from conexion import Conexion  # Importamos la clase Conexion
 
 def mostrar_menu():
+    config = Configuracion()
     pygame.init()
-    pantalla = pygame.display.set_mode((ancho, largo))
-    pygame.display.set_caption("Deadshoot - Menú")
+    pantalla = pygame.display.set_mode((config.ancho, config.largo))
+    pygame.display.set_caption("Hunter_Bird - Menú")
 
-    fondo_menu = pygame.image.load("imgs/logo.png").convert()
-    fondo_menu = pygame.transform.scale(fondo_menu, (ancho, largo))
+    # Crear una instancia de Conexion y conectarse a la base de datos
+    conexion = Conexion()
+    conexion.conectar()
 
-    fondo_instrucciones = pygame.image.load("imgs/logo4.png").convert()
-    fondo_instrucciones = pygame.transform.scale(fondo_instrucciones, (ancho, largo))
+    # Cargar fondo
+    try:
+        fondo = pygame.image.load(config.ruta_logo_menu).convert()
+        fondo = pygame.transform.scale(fondo, (config.ancho, config.largo))
+    except Exception as e:
+        print(f"❌ Error al cargar fondo: {e}")
+        fondo = pygame.Surface((config.ancho, config.largo))
+        fondo.fill(config.color_fondo)
 
-    fondo_nombre = pygame.image.load("imgs/logo5.png").convert()
-    fondo_nombre = pygame.transform.scale(fondo_nombre, (ancho, largo))
+    # Cargar imágenes de botones
+    try:
+        img_jugar = pygame.image.load("Imgs/jugar.png").convert_alpha()
+        img_instrucciones = pygame.image.load("Imgs/instrucciones.png").convert_alpha()
+        img_salir = pygame.image.load("Imgs/salir.png").convert_alpha()
+        img_puntuaciones = pygame.image.load("Imgs/puntuaciones.png").convert_alpha()  # Nuevo botón
+    except Exception as e:
+        print(f"Error al cargar botones: {e}")
+        pygame.quit()
+        sys.exit()
+
+    spacing = 90
+    centro_x = config.ancho // 2
+    inicio_y = config.largo // 2 - spacing
+
+    rect_jugar = img_jugar.get_rect(center=(centro_x, inicio_y))
+    rect_instrucciones = img_instrucciones.get_rect(center=(centro_x, inicio_y + spacing))
+    rect_salir = img_salir.get_rect(center=(centro_x, inicio_y + 2 * spacing))
+    rect_puntuaciones = img_puntuaciones.get_rect(center=(centro_x, inicio_y + 3 * spacing))  # Nuevo botón
 
     reloj = pygame.time.Clock()
 
-    zonas_boton = {
-        "JUGAR": pygame.Rect(500, 350, 300, 50),
-        "INSTRUCCIONES": pygame.Rect(460, 420, 400, 50),
-        "SALIR": pygame.Rect(540, 490, 200, 50)
-    }
-
-    fuente_boton = pygame.font.SysFont(None, 36)
-
     def pedir_nombre():
         nombre = ""
-        fuente_nombre = pygame.font.SysFont(None, 40)
-        input_active = True
-        input_rect = pygame.Rect(400, 300, 400, 50)
-        color_input_box = pygame.Color('red')
-        color_input_text = pygame.Color('white')
+        fuente = pygame.font.SysFont(None, 40)
+        input_rect = pygame.Rect(centro_x - 200, 300, 400, 50)
+        activo = True
 
-        while input_active:
-            pantalla.blit(fondo_nombre, (0, 0))
-
-            for evento in pygame.event.get():
-                if evento.type == pygame.QUIT:
+        while activo:
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if evento.type == pygame.KEYDOWN:
-                    if evento.key == pygame.K_RETURN and nombre != "":
-                        input_active = False
-                    elif evento.key == pygame.K_BACKSPACE:
+                elif e.type == pygame.KEYDOWN:
+                    if e.key == pygame.K_RETURN and nombre.strip():
+                        activo = False
+                    elif e.key == pygame.K_BACKSPACE:
                         nombre = nombre[:-1]
-                    else:
-                        nombre += evento.unicode
+                    elif e.unicode.isprintable():
+                        nombre += e.unicode
 
-            texto_nombre = fuente_nombre.render(f"Ingresá tu nombre: {nombre}", True, color_input_text)
-            pantalla.blit(texto_nombre, (input_rect.x + 10, input_rect.y + 10))
-            pygame.draw.rect(pantalla, color_input_box, input_rect, 2)
-
+            pantalla.fill(config.color_fondo)
+            texto = fuente.render(f"Ingresá tu nombre: {nombre}", True, (255, 255, 255))
+            pantalla.blit(texto, (input_rect.x + 10, input_rect.y + 10))
+            pygame.draw.rect(pantalla, (255, 0, 0), input_rect, 2)
             pygame.display.update()
             reloj.tick(60)
 
-        return nombre
+        return nombre.strip()
 
     def mostrar_instrucciones():
-        pantalla.blit(fondo_instrucciones, (0, 0))
-        instrucciones_texto = (
-            "El juego consiste en derribar los platos que van pasando.\n"
-            "Derriba 5 platos para pasar al siguiente nivel.\n"
-            "Cada nivel aumenta la velocidad, sé rápido.\n"
-            "Solo tienes 10 balas, ¡afina tu puntería!\n"
-            "Buena suerte.\n"
-            "Pulsa ENTER para volver al menú."
-        )
-
-        fuente_instrucciones = pygame.font.SysFont(None, 30)
-        lineas = instrucciones_texto.splitlines()
-
-        y_offset = 100
-        for linea in lineas:
-            texto_render = fuente_instrucciones.render(linea, True, (255, 255, 255))
-            pantalla.blit(texto_render, (50, y_offset))
-            y_offset += 40
+        pantalla.blit(fondo, (0, 0))
+        instrucciones = [
+            "El juego consiste en derribar los pájaros que cruzan la pantalla.",
+            "Ganá puntos al hacer clic sobre ellos.",
+            "¡Tenés 10 disparos por ronda!",
+            "Presioná ENTER para volver."
+        ]
+        fuente = pygame.font.SysFont(None, 32)
+        y = 150
+        for linea in instrucciones:
+            t = fuente.render(linea, True, config.color_texto)
+            pantalla.blit(t, t.get_rect(center=(config.ancho // 2, y)))
+            y += 45
 
         pygame.display.update()
-
         esperando = True
         while esperando:
-            for evento in pygame.event.get():
-                if evento.type == pygame.QUIT:
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if evento.type == pygame.KEYDOWN and evento.key == pygame.K_RETURN:
+                elif e.type == pygame.KEYDOWN and e.key == pygame.K_RETURN:
+                    esperando = False
+
+    def mostrar_puntuaciones():
+        pantalla.fill(config.color_fondo)
+        puntuaciones = conexion.obtener_puntuaciones()
+
+        fuente = pygame.font.SysFont(None, 40)
+        y = 150
+
+        for idx, puntuacion in enumerate(puntuaciones):
+            texto = fuente.render(f"{idx+1}. {puntuacion[1]} - {puntuacion[2]} puntos", True, config.color_texto)
+            pantalla.blit(texto, (config.ancho // 2 - texto.get_width() // 2, y))
+            y += 40
+
+        pygame.display.update()
+        esperando = True
+        while esperando:
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif e.type == pygame.KEYDOWN and e.key == pygame.K_RETURN:
                     esperando = False
 
     while True:
-        pantalla.blit(fondo_menu, (0, 0))
+        pantalla.blit(fondo, (0, 0))
 
-        for nombre_boton, rect in zonas_boton.items():
-            pygame.draw.rect(pantalla, (0, 0, 0), rect, 0)
-            texto = fuente_boton.render(nombre_boton, True, (255, 0, 0))
-            texto_rect = texto.get_rect(center=rect.center)
-            pantalla.blit(texto, texto_rect)
+        # Detectar si el mouse está sobre un botón
+        mouse_pos = pygame.mouse.get_pos()
+
+        def dibujar_boton(img, rect):
+            if rect.collidepoint(mouse_pos):
+                resaltado = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+                resaltado.fill((255, 255, 255, 40))
+                pantalla.blit(img, rect)
+                pantalla.blit(resaltado, rect)
+            else:
+                pantalla.blit(img, rect)
+
+        dibujar_boton(img_jugar, rect_jugar)
+        dibujar_boton(img_instrucciones, rect_instrucciones)
+        dibujar_boton(img_salir, rect_salir)
+        dibujar_boton(img_puntuaciones, rect_puntuaciones)  # Mostrar el nuevo botón
 
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
-            if evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
-                pos = pygame.mouse.get_pos()
-
-                if zonas_boton["JUGAR"].collidepoint(pos):
-                    nombre_jugador = pedir_nombre()
-                    print(f"Jugador: {nombre_jugador}")
-                    return nombre_jugador
-
-                elif zonas_boton["INSTRUCCIONES"].collidepoint(pos):
+            elif evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
+                if rect_jugar.collidepoint(mouse_pos):
+                    nombre = pedir_nombre()
+                    return nombre
+                elif rect_instrucciones.collidepoint(mouse_pos):
                     mostrar_instrucciones()
-
-                elif zonas_boton["SALIR"].collidepoint(pos):
+                elif rect_salir.collidepoint(mouse_pos):
                     pygame.quit()
                     sys.exit()
+                elif rect_puntuaciones.collidepoint(mouse_pos):  # Mostrar puntuaciones
+                    mostrar_puntuaciones()
 
         pygame.display.update()
-        reloj.tick(60)
+        reloj.tick(config.fps if hasattr(config, 'fps') else 60)
