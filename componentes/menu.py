@@ -170,18 +170,26 @@ def mostrar_puntuaciones(pantalla):
     fondo = pygame.image.load("imgs/background5.png").convert()
     fondo = pygame.transform.scale(fondo, pantalla.get_size())
 
-    efecto = pygame.mixer.Sound("canciones/efecto.wav")
-    efecto.set_volume(0.25)  # Volumen reducido
-    efecto.play()
-
     fuente_titulo = cargar_fuente(52)
     fuente_texto = cargar_fuente(26)
     titulo = fuente_titulo.render("PUNTUACIONES", True, (255, 255, 0))
 
     conn = sqlite3.connect("puntuaciones.db")
     cursor = conn.cursor()
-    cursor.execute("CREATE TABLE IF NOT EXISTS puntuaciones (id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT, puntos INTEGER, combo INTEGER, aciertos INTEGER, nivel TEXT)")
-    cursor.execute("SELECT nombre, puntos, combo, aciertos, nivel FROM puntuaciones ORDER BY puntos DESC LIMIT 10")
+
+    # Asegurarse de que la tabla existe con los nombres de columnas correctos
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS puntuaciones (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT,
+            puntos INTEGER,
+            combo_max INTEGER,
+            aciertos INTEGER,
+            nivel TEXT,
+            fecha TEXT
+        )
+    """)
+    cursor.execute("SELECT nombre, puntos, combo_max, aciertos, nivel FROM puntuaciones ORDER BY puntos DESC LIMIT 10")
     resultados = cursor.fetchall()
     conn.close()
 

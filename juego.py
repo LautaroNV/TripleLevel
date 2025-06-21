@@ -35,8 +35,8 @@ archivos_canciones = {
 
 tiempos_canciones = {
     "jugar_1": 150000,
-    "jugar_2": 190000,
-    "jugar_3": 170000,
+    "jugar_2": 208000,
+    "jugar_3": 172000,
 }
 
 def juego(notas, estado_actual):

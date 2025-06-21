@@ -10,7 +10,6 @@ def guardar_puntuacion(nombre, puntos, combo_max, aciertos, nivel):
     conn = sqlite3.connect("puntuaciones.db")
     cursor = conn.cursor()
 
-    # Asegura que la tabla tenga todas las columnas necesarias
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS puntuaciones (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,7 +22,6 @@ def guardar_puntuacion(nombre, puntos, combo_max, aciertos, nivel):
         )
     """)
 
-    # Guarda los datos
     cursor.execute("""
         INSERT INTO puntuaciones (nombre, puntos, combo_max, aciertos, nivel, fecha)
         VALUES (?, ?, ?, ?, ?, ?)
@@ -33,11 +31,18 @@ def guardar_puntuacion(nombre, puntos, combo_max, aciertos, nivel):
     conn.close()
 
 def pantalla_resultado(pantalla, puntos, combo_max, aciertos, nivel):
+    efecto = pygame.mixer.Sound("canciones/efecto.wav")
+    efecto.set_volume(0.4)
+    efecto.play()
+
+    fondo = pygame.image.load("imgs/background5.png").convert()
+    fondo = pygame.transform.scale(fondo, pantalla.get_size())
+
     fuente_titulo = cargar_fuente(60)
     fuente_texto = cargar_fuente(32)
     fuente_input = cargar_fuente(40)
 
-    titulo = fuente_titulo.render("RESULTADO FINAL", True, (255, 255, 0))
+    titulo = fuente_titulo.render("¡ESO SI QUE ES ROCK!", True, (255, 255, 0))
     puntos_txt = fuente_texto.render(f"Puntos: {puntos}", True, (255, 255, 255))
     combo_txt = fuente_texto.render(f"Combo Máximo: {combo_max}", True, (255, 255, 255))
     aciertos_txt = fuente_texto.render(f"Aciertos: {aciertos}", True, (255, 255, 255))
@@ -47,7 +52,7 @@ def pantalla_resultado(pantalla, puntos, combo_max, aciertos, nivel):
     clock = pygame.time.Clock()
 
     while True:
-        pantalla.fill((0, 0, 0))
+        pantalla.blit(fondo, (0, 0))
         pantalla.blit(titulo, (pantalla.get_width() // 2 - titulo.get_width() // 2, 80))
         pantalla.blit(puntos_txt, (100, 200))
         pantalla.blit(combo_txt, (100, 260))
