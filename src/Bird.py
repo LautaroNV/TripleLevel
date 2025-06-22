@@ -8,7 +8,7 @@ class Bird:
         self.cargar_animacion()
         self.frame_actual = 0
         self.contador_animacion = 0
-        self.velocidad = 3
+        self.velocidad = random.randint(2, 5)  # velocidad inicial aleatoria
         self.rect = self.frames[0].get_rect()
         self.reset_pos()
 
@@ -16,20 +16,18 @@ class Bird:
         for i in range(7):
             ruta = os.path.join("Imgs", f"pajaro{i}.png")
             imagen = pygame.image.load(ruta).convert_alpha()
-            imagen = pygame.transform.scale(imagen, (30, 30))
+            imagen = pygame.transform.scale(imagen, (45, 45))  # tamaño más grande
             self.frames.append(imagen)
 
     def reset_pos(self):
-        self.rect.x = -60
+        self.rect.x = -random.randint(60, 300)
         self.rect.y = random.randint(50, 400)
-        
 
     def mover(self):
         self.rect.x += self.velocidad
         if self.rect.x > 800:
             self.reset_pos()
 
-  
         self.contador_animacion += 1
         if self.contador_animacion >= 5: 
             self.frame_actual = (self.frame_actual + 1) % len(self.frames)

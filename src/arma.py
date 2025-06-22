@@ -3,7 +3,7 @@ import pygame
 class Arma(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
-        escala = 0.3  # Ajustá según el tamaño deseado
+        escala = 2  # Ajustá según el tamaño deseado
 
         # Cargar y escalar los frames
         self.frames = []

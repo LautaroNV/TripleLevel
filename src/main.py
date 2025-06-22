@@ -14,6 +14,14 @@ def main():
     pantalla = pygame.display.set_mode((config.ancho, config.largo))
     pygame.display.set_caption("Hunter_Bird")
 
+    # Música de fondo (loop)
+    try:
+        pygame.mixer.music.load("Sonido/tema.mp3")
+        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.play(-1)
+    except Exception as e:
+        print(f"Error al cargar música de fondo: {e}")
+
     # Conectarse a la base de datos
     conexion = Conexion()
     conexion.conectar()
@@ -36,6 +44,7 @@ def main():
         # Sonido
         try:
             disparo_sonido = pygame.mixer.Sound("Sonido/doom-shotgun.mp3")
+            disparo_sonido.set_volume(0.4)
         except Exception as e:
             print(f"Error al cargar sonido de disparo: {e}")
             disparo_sonido = None
@@ -51,7 +60,7 @@ def main():
             sys.exit()
 
         # Pájaros
-        pajaros = [Bird() for _ in range(7)]  # 7 pájaros inicialmente
+        pajaros = [Bird() for _ in range(7)]
 
         # Ejecutar modo tiempo (sin selección de nivel)
         nivel = Nivel(pantalla, fuente, reloj, config)
@@ -62,18 +71,14 @@ def main():
             arma_esperando=arma_idle,
             arma_disparo=arma_disparo,
             arma_retroceso=arma_retroceso,
-            puntuacion_inicial=0  # Aquí cambiamos puntuacion por puntuacion_inicial
+            puntuacion_inicial=0
         )
 
         if isinstance(resultado, int):
-            print(f"{nombre_jugador} obtuvo una puntuación final de: {resultado}")
-            conexion.guardar_puntaje(nombre_jugador, resultado)
-            break
+         print(f"{nombre_jugador} obtuvo una puntuacion final de: {resultado}")
+         conexion.guardar_puntaje(nombre_jugador, resultado)
+        continue  # volver al menú para jugar de nuevo
 
-    # Cerrar conexión
-    conexion.cerrar()
-    pygame.quit()
-    sys.exit()
 
 if __name__ == "__main__":
     main()
