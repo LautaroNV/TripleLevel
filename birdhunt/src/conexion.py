@@ -11,7 +11,7 @@ class Conexion:
             self.conn = mysql.connector.connect(
                 host="localhost",
                 user="root",
-                password="",  # Vacío por defecto en XAMPP
+                password="",
                 database="hunter_bird"
             )
             if self.conn.is_connected():
@@ -36,7 +36,7 @@ class Conexion:
     def obtener_puntuaciones(self):
         try:
             if self.conn.is_connected():
-                self.cursor.execute("SELECT nombre, puntuacion FROM puntuaciones ORDER BY puntuacion DESC LIMIT 10")
+                self.cursor.execute("SELECT id, nombre, puntuacion FROM puntuaciones ORDER BY puntuacion DESC LIMIT 10")
                 return self.cursor.fetchall()
         except Error as e:
             print(f"Error al obtener puntuaciones: {e}")

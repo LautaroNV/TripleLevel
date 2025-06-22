@@ -16,7 +16,7 @@ def mostrar_menu():
 
     # Cargar imagen de fondo/logo a pantalla completa
     try:
-        ruta_logo = os.path.join("Imgs", "logo.png")  # imagen completa de fondo
+        ruta_logo = os.path.join("birdhunt", "src", "Imgs", "logo.png")
         fondo = pygame.image.load(ruta_logo).convert()
         fondo = pygame.transform.scale(fondo, (config.ancho, config.largo))
     except Exception as e:
@@ -26,19 +26,18 @@ def mostrar_menu():
 
     # Fuente personalizada
     try:
-        ruta_fuente = os.path.join("fuentes", "Minecraft.ttf")
+        ruta_fuente = os.path.join("birdhunt", "src", "fuentes", "Minecraft.ttf")
         fuente = pygame.font.Font(ruta_fuente, 30)
     except:
         print("No se pudo cargar la fuente Minecraft.ttf")
         fuente = pygame.font.SysFont(None, 40)
 
-    # Botones del menú
     botones = ["JUGAR", "INSTRUCCIONES", "SALIR", "PUNTUACIONES"]
     acciones = ["jugar", "instrucciones", "salir", "puntuaciones"]
     rects = []
     spacing = 60
     centro_x = config.ancho // 2
-    inicio_y = config.largo // 2 + 20  # posición más abajo para dar aire al fondo
+    inicio_y = config.largo // 2 + 20
 
     for i, texto in enumerate(botones):
         t = fuente.render(texto, True, config.color_texto)
@@ -74,21 +73,20 @@ def mostrar_menu():
         return nombre.strip()
 
     def mostrar_instrucciones():
-        # Cargar fondo alternativo fondo2.png
         try:
-            ruta_fondo2 = os.path.join("Imgs", "instrucciones.png")
+            ruta_fondo2 = os.path.join("birdhunt", "src", "Imgs", "instrucciones.png")
             fondo_instrucciones = pygame.image.load(ruta_fondo2).convert()
             fondo_instrucciones = pygame.transform.scale(fondo_instrucciones, (config.ancho, config.largo))
         except Exception as e:
             print(f"No se pudo cargar fondo2.png: {e}")
-            fondo_instrucciones = fondo  # Usa el fondo original si falla
+            fondo_instrucciones = fondo
 
         pantalla.blit(fondo_instrucciones, (0, 0))
         instrucciones = [
-            "Dispara pajaros.",
-            "Gana puntos al acertar con clic.",
-            "¡Recarga con la tecla E!",
-            "Presiona ENTER para volver."
+            "Dispará a los pájaros.",
+            "Ganás puntos con cada acierto (clic).",
+            "¡Recargá con la tecla E!",
+            "Presioná ENTER para volver."
         ]
         y = 250
         for linea in instrucciones:
@@ -111,7 +109,7 @@ def mostrar_menu():
         puntuaciones = conexion.obtener_puntuaciones()
         y = 150
         for idx, puntuacion in enumerate(puntuaciones):
-            texto = fuente.render(f"{idx+1}. {puntuacion[1]} - {puntuacion[2]} puntos", True, config.color_texto)
+            texto = fuente.render(f"{idx+1}. {puntuacion[0]} - {puntuacion[1]} puntos", True, config.color_texto)
             pantalla.blit(texto, (centro_x - texto.get_width() // 2, y))
             y += 40
 
@@ -129,14 +127,12 @@ def mostrar_menu():
     while True:
         pantalla.blit(fondo, (0, 0))
 
-        # Dibujar botones
         mouse_pos = pygame.mouse.get_pos()
         for texto, rect, accion in rects:
             color = (255, 255, 255) if rect.collidepoint(mouse_pos) else config.color_texto
             t = fuente.render(texto, True, color)
             pantalla.blit(t, t.get_rect(center=rect.center))
 
-        # Eventos
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 pygame.quit()

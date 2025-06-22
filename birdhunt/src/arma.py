@@ -1,14 +1,15 @@
 import pygame
+import os
 
 class Arma(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
-        escala = 2  # Ajustá según el tamaño deseado
+        escala = 2
 
-        # Cargar y escalar los frames
         self.frames = []
         for i in range(5):
-            img = pygame.image.load(f"Imgs/arma{i}.png").convert_alpha()
+            ruta = os.path.join("birdhunt", "Imgs", f"arma{i}.png")
+            img = pygame.image.load(ruta).convert_alpha()
             ancho = int(img.get_width() * escala)
             alto = int(img.get_height() * escala)
             img = pygame.transform.scale(img, (ancho, alto))
@@ -19,7 +20,7 @@ class Arma(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom=pos)
 
         self.animando = False
-        self.tiempo_animacion = 50  # ms entre frames
+        self.tiempo_animacion = 50
         self.ultimo_update = pygame.time.get_ticks()
 
     def disparar(self):
@@ -36,5 +37,5 @@ class Arma(pygame.sprite.Sprite):
                     self.index = 0
                     self.animando = False
                 self.image = self.frames[self.index]
-                self.rect = self.image.get_rect(midbottom=self.rect.midbottom)  # mantener posición
+                self.rect = self.image.get_rect(midbottom=self.rect.midbottom)
                 self.ultimo_update = ahora

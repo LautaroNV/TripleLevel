@@ -12,9 +12,8 @@ class Nivel:
         self.reloj = reloj
         self.config = config
 
-        # Intentar cargar la fuente Minecraft
         try:
-            ruta_fuente = os.path.join("fuentes", "Minecraft.ttf")
+            ruta_fuente = os.path.join("birdhunt", "src", "fuentes", "Minecraft.ttf")
             self.fuente = pygame.font.Font(ruta_fuente, 30)
         except:
             print("No se pudo cargar la fuente Minecraft.ttf")
@@ -22,11 +21,7 @@ class Nivel:
 
     def mostrar_arma(self, estado, arma_esperando, arma_disparo, arma_retroceso):
         ancho, largo = self.config.ancho, self.config.largo
-
-        # --- POSICIONAMIENTO DEL ARMA ---
-        # Cambiá esta línea si querés mover el arma más arriba o abajo:
-        borde_inferior = -40  # ← valor editable: +N más arriba, -N más abajo
-        # ---------------------------------
+        borde_inferior = -40
 
         if estado == "esperando":
             arma = arma_esperando
@@ -94,9 +89,8 @@ class Nivel:
         self.mostrar_arma(arma_estado, arma_esperando, arma_disparo, arma_retroceso)
 
     def mostrar_estadisticas_finales(self, puntuacion, pajaros_destruidos):
-        # Cargar imagen instrucciones como fondo de estadísticas
         try:
-            fondo_final = pygame.image.load(os.path.join("Imgs", "instrucciones.png")).convert()
+            fondo_final = pygame.image.load(os.path.join("birdhunt", "src", "Imgs", "instrucciones.png")).convert()
             fondo_final = pygame.transform.scale(fondo_final, (self.config.ancho, self.config.largo))
         except:
             fondo_final = pygame.Surface((self.config.ancho, self.config.largo))
@@ -133,15 +127,15 @@ class Nivel:
     def ejecutar_modo_tiempo(self, pajaros, sonido_disparo, imagen_fondo,
                              arma_esperando, arma_disparo, arma_retroceso, puntuacion_inicial):
 
-        # Cargar sonido de recarga
+        # Sonido de recarga
         try:
-            sonido_recarga = pygame.mixer.Sound("Sonido/recarga.mp3")
+            ruta_sonido = os.path.join("birdhunt", "src", "Sonido", "recarga.mp3")
+            sonido_recarga = pygame.mixer.Sound(ruta_sonido)
             sonido_recarga.set_volume(0.3)
         except:
             print("No se pudo cargar el sonido de recarga.")
             sonido_recarga = None
 
-        # Reducir volumen del disparo
         if sonido_disparo:
             sonido_disparo.set_volume(0.4)
 
@@ -158,7 +152,6 @@ class Nivel:
         tiempo_inicio = pygame.time.get_ticks()
         tiempo_recarga = 0
 
-        # Velocidades aleatorias a cada pájaro
         for pajaro in pajaros:
             pajaro.velocidad = random.randint(2, 5)
 
