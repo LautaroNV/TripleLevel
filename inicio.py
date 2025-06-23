@@ -98,7 +98,6 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             for rect, opcion in rect_opciones:
                 if rect.collidepoint(event.pos):
