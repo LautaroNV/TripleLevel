@@ -13,7 +13,7 @@ class Nivel:
         self.config = config
 
         try:
-            ruta_fuente = os.path.join("birdhunt", "src", "fuentes", "Minecraft.ttf")
+            ruta_fuente = os.path.join("birdhunt", "fuentes", "Minecraft.ttf")
             self.fuente = pygame.font.Font(ruta_fuente, 30)
         except:
             print("No se pudo cargar la fuente Minecraft.ttf")
@@ -90,7 +90,7 @@ class Nivel:
 
     def mostrar_estadisticas_finales(self, puntuacion, pajaros_destruidos):
         try:
-            fondo_final = pygame.image.load(os.path.join("birdhunt", "src", "Imgs", "instrucciones.png")).convert()
+            fondo_final = pygame.image.load(os.path.join("birdhunt", "Imgs", "instrucciones.png")).convert()
             fondo_final = pygame.transform.scale(fondo_final, (self.config.ancho, self.config.largo))
         except:
             fondo_final = pygame.Surface((self.config.ancho, self.config.largo))
@@ -129,7 +129,7 @@ class Nivel:
 
         # Sonido de recarga
         try:
-            ruta_sonido = os.path.join("birdhunt", "src", "Sonido", "recarga.mp3")
+            ruta_sonido = os.path.join("birdhunt", "Sonido", "recarga.mp3")
             sonido_recarga = pygame.mixer.Sound(ruta_sonido)
             sonido_recarga.set_volume(0.3)
         except:

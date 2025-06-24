@@ -15,5 +15,5 @@ class Configuracion:
         self.fuente_default = ""
         self.fps = 60
 
-        self.ruta_fondo_juego = os.path.join("birdhunt", "src", "Imgs", "fondo1.png")
-        self.ruta_logo_menu = os.path.join("birdhunt", "src", "Imgs", "logo.png")
+        self.ruta_fondo_juego = os.path.join("birdhunt", "Imgs", "fondo1.png")
+        self.ruta_logo_menu = os.path.join("birdhunt", "Imgs", "logo.png")

@@ -46,4 +46,3 @@ class Conexion:
         if self.conn and self.conn.is_connected():
             self.cursor.close()
             self.conn.close()
-            print("Conexión cerrada.")

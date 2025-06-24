@@ -16,7 +16,7 @@ def mostrar_menu():
 
     # Cargar imagen de fondo/logo a pantalla completa
     try:
-        ruta_logo = os.path.join("birdhunt", "src", "Imgs", "logo.png")
+        ruta_logo = os.path.join("birdhunt", "Imgs", "logo.png")
         fondo = pygame.image.load(ruta_logo).convert()
         fondo = pygame.transform.scale(fondo, (config.ancho, config.largo))
     except Exception as e:
@@ -26,7 +26,7 @@ def mostrar_menu():
 
     # Fuente personalizada
     try:
-        ruta_fuente = os.path.join("birdhunt", "src", "fuentes", "Minecraft.ttf")
+        ruta_fuente = os.path.join("birdhunt", "fuentes", "Minecraft.ttf")
         fuente = pygame.font.Font(ruta_fuente, 30)
     except:
         print("No se pudo cargar la fuente Minecraft.ttf")
@@ -74,7 +74,7 @@ def mostrar_menu():
 
     def mostrar_instrucciones():
         try:
-            ruta_fondo2 = os.path.join("birdhunt", "src", "Imgs", "instrucciones.png")
+            ruta_fondo2 = os.path.join("birdhunt", "Imgs", "instrucciones.png")
             fondo_instrucciones = pygame.image.load(ruta_fondo2).convert()
             fondo_instrucciones = pygame.transform.scale(fondo_instrucciones, (config.ancho, config.largo))
         except Exception as e:
@@ -83,10 +83,11 @@ def mostrar_menu():
 
         pantalla.blit(fondo_instrucciones, (0, 0))
         instrucciones = [
-            "Dispará a los pájaros.",
-            "Ganás puntos con cada acierto (clic).",
-            "¡Recargá con la tecla E!",
-            "Presioná ENTER para volver."
+            "Dispara a los pajaros.",
+            "Ganas puntos con cada acierto (clic).",
+            "¡Recarga con la tecla E!",
+            "Con la R reinicias el Nivel",
+            "Presiona ENTER para volver."
         ]
         y = 250
         for linea in instrucciones:
@@ -109,7 +110,8 @@ def mostrar_menu():
         puntuaciones = conexion.obtener_puntuaciones()
         y = 150
         for idx, puntuacion in enumerate(puntuaciones):
-            texto = fuente.render(f"{idx+1}. {puntuacion[0]} - {puntuacion[1]} puntos", True, config.color_texto)
+            # puntuacion = (id, nombre, puntos)
+            texto = fuente.render(f"{idx+1}. {puntuacion[1]} - {puntuacion[2]} puntos", True, config.color_texto)
             pantalla.blit(texto, (centro_x - texto.get_width() // 2, y))
             y += 40
 

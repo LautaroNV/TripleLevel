@@ -2,8 +2,12 @@ import pygame
 import sys
 import os
 
-# Ajustar el path para importar desde birdhunt
-sys.path.append(os.path.join(os.path.dirname(__file__), 'birdhunt', 'src'))
+# Forzar el directorio de trabajo a la raíz del proyecto
+RUTA_PROYECTO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+os.chdir(RUTA_PROYECTO)
+
+# Ajustar el path para importar desde birdhunt/src
+sys.path.append(os.path.dirname(__file__))
 
 from configuracion import Configuracion
 from Bird import Bird
@@ -21,12 +25,12 @@ def main():
 
     # Música de fondo (loop)
     try:
-        ruta_musica = os.path.join("birdhunt", "src", "Sonido", "tema.mp3")
+        ruta_musica = os.path.join("birdhunt", "Sonido", "tema.mp3")
         pygame.mixer.music.load(ruta_musica)
         pygame.mixer.music.set_volume(0.2)
         pygame.mixer.music.play(-1)
     except Exception as e:
-        print(f"Error al cargar música de fondo: {e}")
+        print(f"Error al cargar musica de fondo: {e}")
 
     # Conectarse a la base de datos
     conexion = Conexion()
@@ -40,7 +44,7 @@ def main():
 
         # Fondo
         try:
-            fondo = pygame.image.load(config.ruta_fondo_juego).convert()
+            fondo = pygame.image.load(os.path.join("birdhunt", "Imgs", "fondo1.png")).convert()
             fondo = pygame.transform.scale(fondo, (config.ancho, config.largo))
         except Exception as e:
             print(f"Error al cargar fondo: {e}")
@@ -49,7 +53,7 @@ def main():
 
         # Sonido
         try:
-            ruta_disparo = os.path.join("birdhunt", "src", "Sonido", "doom-shotgun.mp3")
+            ruta_disparo = os.path.join("birdhunt", "Sonido", "doom-shotgun.mp3")
             disparo_sonido = pygame.mixer.Sound(ruta_disparo)
             disparo_sonido.set_volume(0.4)
         except Exception as e:
@@ -58,9 +62,9 @@ def main():
 
         # Armas
         try:
-            arma_idle = pygame.image.load(os.path.join("birdhunt", "src", "Imgs", "arma0.png")).convert_alpha()
-            arma_disparo = pygame.image.load(os.path.join("birdhunt", "src", "Imgs", "arma2.png")).convert_alpha()
-            arma_retroceso = pygame.image.load(os.path.join("birdhunt", "src", "Imgs", "arma3.png")).convert_alpha()
+            arma_idle = pygame.image.load(os.path.join("birdhunt", "Imgs", "arma0.png")).convert_alpha()
+            arma_disparo = pygame.image.load(os.path.join("birdhunt", "Imgs", "arma2.png")).convert_alpha()
+            arma_retroceso = pygame.image.load(os.path.join("birdhunt", "Imgs", "arma3.png")).convert_alpha()
         except Exception as e:
             print(f"Error al cargar imágenes de arma: {e}")
             pygame.quit()
